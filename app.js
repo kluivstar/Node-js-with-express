@@ -1,9 +1,19 @@
 const express = require('express')
-const app = express()
+const fs = require('fs')
 
-// Route
-app.get('/', (req, res)=>{
-    res.status(200).send("Something's started")
+const app = express()
+// Read file
+let movies = JSON.parse(fs.readFileSync("./data/movies.json"))
+
+// GET - api/movies
+app.get('/movies', (req, res)=>{
+    res.status(200).json({
+        // json json formatting
+        status: "success",
+        data: {
+            movies:movies
+        }
+    })
 })
 
 // Create Server
