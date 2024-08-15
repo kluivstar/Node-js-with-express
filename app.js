@@ -57,6 +57,7 @@ app.post('/movies', (req, res) => {
         })
     })
 })
+
 // Create Server
 const port = 3000
 app.listen(port, ()=>{
