@@ -46,6 +46,7 @@ app.get('/movies/:id', (req, res) =>{
 })
 // POST - api/movies
 app.post('/movies', (req, res) => {
+     // extracting the id from the request using "params" then multiplying by 1 to make it a number
     const newID = movies[movies.length - 1].id + 1
     const newMovie = Object.assign({id: newID}, req.body)
     movies.push(newMovie)
@@ -59,6 +60,7 @@ app.post('/movies', (req, res) => {
     })
 })
 app.patch('/movies/:id', (req, res) => {
+     // extracting the id from the request using "params" then multiplying by 1 to make it a number
     let id = req.params.id * 1
     let movieToUpdate  = movies.find(el => el.id === id)
     let index = movies.indexOf(movieToUpdate)
@@ -71,6 +73,36 @@ app.patch('/movies/:id', (req, res) => {
             status: "success",
             data: {
                 movie: movieToUpdate
+            }
+        })
+    })
+})
+
+app.delete('/movies/:id', (req, res) =>{
+    // extracting the id from the request using "params" then multiplying by 1 to make it a number
+    const id = req.params.id * 1
+    
+    // matching user route parameter id to id of movie array
+    const movieToDelete = movies.find(el=> el.id === id)
+    // If theres no movies to remove from the server
+    if(!movieToDelete){
+        return res.status(404).json({
+            status: "fail",
+            data: {
+                message: `Movie with ${id} not found`
+            }
+        })
+    }
+
+    const index = movies.indexOf(movieToDelete)
+    movies.splice(index, 1)
+
+    // when theres movies to remove from server
+    fs.writeFile('./data/movies.json', JSON.stringify(movies), (err) => {
+        res.send(204).json({
+            status: "success.",
+            data: {
+                movie: null
             }
         })
     })
