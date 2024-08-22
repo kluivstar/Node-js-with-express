@@ -52,7 +52,7 @@ const createMovies = (req, res) => {
     const newID = movies[movies.length - 1].id + 1
     const newMovie = Object.assign({id: newID}, req.body)
     movies.push(newMovie)
-    fs.writeFile('/data/movies.json', JSON.stringify(movies), (err)=>{
+    fs.writeFile('./data/movies.json', JSON.stringify(movies), (err)=>{
         res.status(201).json({
             status: "success",
             data: {
@@ -117,16 +117,18 @@ app.post('/movies', createMovies)
 app.patch('/movies/:id', updateMovie)
 app.delete('/movies/:id', deleteMovie) */
 
-app.route('/movies')
+const movieRouter = express.Router()
+
+movieRouter.route('/')
     .get(getAllMovies)
     .post(createMovies)
 
-app.route('/movies:id')
-    .get(getAllMovies)
+movieRouter.route('/:id')
+    .get(getRouteId)
     .patch(updateMovie)
     .delete(deleteMovie)
 
-
+app.use('/movies', movieRouter)
 // Create Server
 const port = 3000
 app.listen(port, ()=>{
