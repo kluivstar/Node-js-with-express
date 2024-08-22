@@ -1,23 +1,25 @@
 // Setting Up Express and Reading the JSON File
 const express = require('express')
 const fs = require("fs")
-
+const morgan = require('morgan')
 const app = express()
 // Read file
 let movies = JSON.parse(fs.readFileSync("./data/movies.json"))
 
 // Middleware that parse incoming JSON request
-const logger =  function(req, req, next) {
-    console.log("Working")
+const logger =  function(req, res, next) {
+    req.requestedAt = new Date().toISOString()
     next()
 }
 app.use(express.json())
+app.use(morgan('dev'))
 app.use(logger)
 // ROUTE HANDLER FUNCTIONS
 const getAllMovies = (req, res)=>{
     res.status(200).json({
         // json json formatting
         status: "success",
+        requestAt: req.requestedAt,
         data: {
             movies:movies
         }
