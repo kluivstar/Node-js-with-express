@@ -7,8 +7,12 @@ const app = express()
 let movies = JSON.parse(fs.readFileSync("./data/movies.json"))
 
 // Middleware that parse incoming JSON request
+const logger =  function(req, req, next) {
+    console.log("Working")
+    next()
+}
 app.use(express.json())
-
+app.use(logger)
 // ROUTE HANDLER FUNCTIONS
 const getAllMovies = (req, res)=>{
     res.status(200).json({
