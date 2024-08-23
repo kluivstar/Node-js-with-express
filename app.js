@@ -24,8 +24,6 @@ app.delete('/movies/:id', deleteMovie) */
 
 // using our imported route module
 app.use('/movies', moviesRouter)
-// Create Server
-const port = 3000
-app.listen(port, ()=>{
-    console.log("Server wanna be startin something.")
-})
+
+// import server
+module.exports = app
