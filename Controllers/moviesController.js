@@ -4,7 +4,7 @@ const fs = require("fs")
 // Read throug source file
 let movies = JSON.parse(fs.readFileSync("./data/movies.json"))
 
-// param middleware 
+// param middleware to handles missing specific parameter during request. checkId is added to endpoint
 exports.checkId = (req, res, next, value ) => {
     console.log(`Movie Id ` + value)
     let movie = movies.find(el => el.id === value * 1)
@@ -12,6 +12,15 @@ exports.checkId = (req, res, next, value ) => {
         return res.status(404).json({
             status: 'fail',
             message: `Movie with ${value} not found`
+        })
+    }
+    next()
+}
+exports.validateBody = (req, res, next) => {
+    if(!req.body.name || !req.body.releaseYear) {
+        return res.status(400).json({
+            status: "fail",
+            message: 'Invalid movie data'
         })
     }
     next()
