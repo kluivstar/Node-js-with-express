@@ -13,12 +13,13 @@ const logger =  function(req, res, next) {
     next()
 }
 // Middleware that parse incoming JSON request
+app.use(express.json())
 
 if(process.env.NODE_ENV === 'development'){
-    app.use(express.json())
+    app.use(morgan('dev'))
 }
-// Morgan is a popular middleware for logging HTTP requests.
-app.use(morgan('dev'))
+// Morgan is a popular middleware for logging HTTP requests..
+
 
 // The logger middleware function defined earlier is then added, logging "Custom middleware called" on every request.
 app.use(logger)
