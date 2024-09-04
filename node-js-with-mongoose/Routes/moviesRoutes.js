@@ -4,7 +4,7 @@ const movieController = require('./../Controllers/moviesController')
 const router = express.Router()
 
 // adds checkid to route
-router.param('id', movieController.checkId)
+// router.param('id', movieController.checkId)
 // RHF added to route
 router.route('/')
     .get(movieController.getAllMovies)
