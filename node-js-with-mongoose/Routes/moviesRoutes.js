@@ -8,7 +8,7 @@ const router = express.Router()
 // RHF added to route
 router.route('/')
     .get(movieController.getAllMovies)
-    .post(movieController.validateBody, movieController.createMovies)
+    .post(movieController.createMovies)
 
 router.route('/:id')
     .get(movieController.getMovie)

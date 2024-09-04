@@ -1,5 +1,4 @@
 const mongoose = require('mongoose')
-
 // import dotenv
 const dotenv = require('dotenv')
 //reading/loading our config file
