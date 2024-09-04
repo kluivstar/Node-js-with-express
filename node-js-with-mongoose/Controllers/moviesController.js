@@ -43,14 +43,14 @@ exports.createMovies = async (req, res) => {
     try {
         const movie = await Movie.create(req.body)
 
-        res.status(201).json({
+        res.status(200).json({
             status: "success",
             data: {
                 movie
             }
         })
     }catch(err){
-        res.status(400).json({
+        res.status(404).json({
             status: "fail",
             data: {
                 message: err.message
@@ -59,8 +59,24 @@ exports.createMovies = async (req, res) => {
     }
 }
 
-exports.updateMovie = (req, res) => {
+exports.updateMovie = async (req, res) => {
+    try {
+        const updateMovie = await Movie.findByIdAndUpdate(req.params.id, req.body, {new: true, runValidators: true})
 
+        res.status(200).json({
+            status: "success",
+            data: {
+                movie: updateMovie
+            }
+        })
+    }catch(err){
+        res.status(404).json({
+            status: "fail",
+            data: {
+                message: err.message
+            }
+        })
+    }
 }
 
 exports.deleteMovie = (req, res) =>{
