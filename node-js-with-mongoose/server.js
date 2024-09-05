@@ -1,8 +1,10 @@
 const mongoose = require('mongoose')
 // import dotenv
 const dotenv = require('dotenv')
-//reading/loading our config file
+
+//reading/loading our config file defining our environmental variable like CONN_STR
 dotenv.config({path: './config.env'})
+
 // require express importing main express app from the app.js
 const app = require('./app')
 
