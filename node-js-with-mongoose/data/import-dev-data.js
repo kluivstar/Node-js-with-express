@@ -34,6 +34,7 @@ const importMovies = async ()=> {
     }catch(err){
         console.log(err.message)
     }
+    process.exit()
 }
 if(process.argv[2] === '--import'){
     importMovies()
