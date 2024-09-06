@@ -4,7 +4,13 @@ const Movie = require('./../Models/movieModels')
 // ROUTE HANDLER FUNCTIONS
 exports.getAllMovies = async (req, res)=>{
     try {
-        const movies = await Movie.find(req.query)
+        console.log(req.query)
+        let queryStr = JSON.stringify(req.query)
+        queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/g, (match)=> `$${match}`)
+        const queryObj = JSON.parse(queryStr)
+       
+        console.log(queryObj)
+        const movies = await Movie.find(queryObj)
         
         res.status(200).json({
             status: "success",
