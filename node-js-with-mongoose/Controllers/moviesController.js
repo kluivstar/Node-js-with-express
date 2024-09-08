@@ -4,28 +4,50 @@ const Movie = require('./../Models/movieModels')
 // ROUTE HANDLER FUNCTIONS
 exports.getAllMovies = async (req, res)=>{
     try {
-        console.log(req.query)
-        // CONVERT QUERY TO STRING
-        let queryStr = JSON.stringify(req.query)
-        
-        // CONVERT TO MONGO DB FORMAT
-        queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/g, (match)=> `$${match}`)
-        const queryObj = JSON.parse(queryStr)
-        
-        // DELETE QUERY OBJ TO AVOID EMPTY ARRAY IN RESPONSE
-        delete queryObj.sort
-        let query = Movie.find(queryObj)
-        
-        // SORTING LOGIC
-        if(req.query.sort){
-            const sortBy = req.query.sort.split(',').join(' ')
-            query = query.sort(sortBy)
-        }else{
-            query = query.sort('-createdAt')
+        // EXCLUDE FIELDS
+        const excludeFields = ['sort', 'page', 'limit', 'fields']
+        const queryObj = { ...req.query }
+        excludeFields.forEach((el) => delete queryObj[el])
+
+        //ADVANCE FILTERING (greater than/ less than/ greater than equal to/ less than equal to)
+
+        let queryStr = JSON.stringify(queryObj)
+
+        // CONVERT REQ QUERY TO MONGO DB FORMAT
+        const regex = /\b(gte|gt|lte|lt)\b/g
+
+        queryStr = queryStr.replace(regex, (match) => `$${match}`)
+
+        const queryObj1 = JSON.parse(queryStr)
+
+        //SORTING
+
+        let query = Movie.find(queryObj1)
+
+        req.query.sort
+        ? query.sort(req.query.sort.split(',').join(' '))
+        : query.sort('-name')
+
+        //LIMITING FIELDS
+
+        req.query.fields
+        ? query.select(req.query.fields.split(',').join(' '))
+        : query.select('-__v')
+
+        //Pagination
+
+        const page = +req.query.page || 1
+        const limit = +req.query.limit || 5
+        const skip = (page - 1) * limit
+        query = query.skip(skip).limit(limit)
+
+        if (req.query.page) {
+        const moviesCount = await Movie.countDocuments()
+        if (skip >= moviesCount)
+            throw new Error(' There are no records to display!!')
         }
 
-
-        const movies = await query;
+    const movies = await query
         res.status(200).json({
             status: "success.",
             length: movies.length,
