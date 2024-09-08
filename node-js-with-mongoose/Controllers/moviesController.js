@@ -19,7 +19,6 @@ exports.getAllMovies = async (req, res)=>{
         // SORTING LOGIC
         if(req.query.sort){
             const sortBy = req.query.sort.split(',').join(' ')
-            console.log(sortBy)
             query = query.sort(sortBy)
         }
         const movies = await query;
