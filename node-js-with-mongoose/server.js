@@ -17,7 +17,7 @@ mongoose.connect(process.env.CONN_STR, {
 }).then((conn) => {
     console.log('DB started something.')
 }).catch((error) =>{
-    console.log('Some error has occured')
+    console.log('Some error has occured, DB not startin something')
 })
 
 

@@ -5,13 +5,24 @@ const Movie = require('./../Models/movieModels')
 exports.getAllMovies = async (req, res)=>{
     try {
         console.log(req.query)
+        // CONVERT QUERY TO STRING
         let queryStr = JSON.stringify(req.query)
+        
+        // CONVERT TO MONGO DB FORMAT
         queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/g, (match)=> `$${match}`)
         const queryObj = JSON.parse(queryStr)
-       
-        console.log(queryObj)
-        const movies = await Movie.find(queryObj)
         
+        // DELETE QUERY OBJ TO AVOID EMPTY ARRAY IN RESPONSE
+        delete queryObj.sort
+        let query = Movie.find(queryObj)
+        
+        // SORTING LOGIC
+        if(req.query.sort){
+            const sortBy = req.query.sort.split(',').join(' ')
+            console.log(sortBy)
+            query = query.sort(sortBy)
+        }
+        const movies = await query;
         res.status(200).json({
             status: "success",
             length: movies.length,
@@ -25,7 +36,8 @@ exports.getAllMovies = async (req, res)=>{
             message: err.message
         })
     }
-}
+} 
+
 // GET SPECIFIC MOVIE/ID RP
 exports.getMovie = async (req, res) =>{
     

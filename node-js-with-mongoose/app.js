@@ -18,8 +18,6 @@ app.use(express.json())
 if(process.env.NODE_ENV === 'development'){
     app.use(morgan('dev'))
 }
-// Morgan is a popular middleware for logging HTTP requests..
-
 
 // The logger middleware function defined earlier is then added, logging "Custom middleware called" on every request.
 app.use(logger)
