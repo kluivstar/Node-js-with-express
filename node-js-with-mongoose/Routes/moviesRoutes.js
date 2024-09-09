@@ -9,6 +9,12 @@ const router = express.Router()
 router.route('/highest-rated')
     .get(movieController.getHighestRated, movieController.getAllMovies)
 
+// HANDLING ROUTES  TO GET MOVIES STATS
+router.route('/movie-stats')
+    .get(movieController.getMovieStats)
+
+// HANDLING ROUTES  TO GET MOVIES BY GENRE
+  
 // HANDLING ROUTES WITH ROUTER OBJECT
 router.route('/')
     .get(movieController.getAllMovies)

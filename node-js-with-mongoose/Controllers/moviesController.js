@@ -15,7 +15,11 @@ exports.getHighestRated = (req, res, next) => {
 // ROUTE HANDLER FUNCTIONS
 exports.getAllMovies = async (req, res)=>{
     try {
-        const features = new ApiFeatures(Movie.find(), req.query).filter().sort().limitFields().paginate()
+        const features = new ApiFeatures(Movie.find(), req.query)
+                        .filter()
+                        .sort()
+                        .limitFields()
+                        .paginate()
 
         // wait for query to return a result and assign to movie then movies is sent as a response
         let movies = await features.query
@@ -158,3 +162,4 @@ exports.deleteMovie = async (req, res) =>{
         })
     }
 }
+

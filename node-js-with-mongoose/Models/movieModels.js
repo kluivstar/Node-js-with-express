@@ -38,7 +38,7 @@ const movieSchema = new mongoose.Schema({
         select: false
     },
     genres: {
-        type: String,
+        type: [String],
         required: [true, 'Genres is required field!'],
         // enum: {
         //      values: ["Action", "Adventure", "Sci-Fi", "Thriller", "Crime", "Drama", "Comedy", "Romance", "Biography"],
@@ -46,7 +46,7 @@ const movieSchema = new mongoose.Schema({
         // }
     },
     directors: {
-        type: String,
+        type: [String],
         required: [true, 'Directors is required field!']
     },
     coverImage:{
@@ -54,7 +54,7 @@ const movieSchema = new mongoose.Schema({
         require: [true, 'Cover image is required field!']
     },
     actors: {
-        type: String,
+        type: [String],
         require: [true, 'actors is required field!']
     },
     price: {
