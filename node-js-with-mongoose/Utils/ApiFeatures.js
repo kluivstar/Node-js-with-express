@@ -44,7 +44,7 @@ class ApiFeatures{
         //promise awaiting data and assigning to 'moviesCount
         //const moviesCount = await Movie.countDocuments()
         //if (skip >= moviesCount)
-       //    throw new Error(' Page not found!')
+       //    throw new Error(' Page not found')
         //}
         return this
     }

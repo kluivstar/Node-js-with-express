@@ -14,7 +14,9 @@ router.route('/movie-stats')
     .get(movieController.getMovieStats)
 
 // HANDLING ROUTES  TO GET MOVIES BY GENRE
-  
+router.route('/movie-by-genre')
+    .get(movieController.getMovieByGenre)
+    
 // HANDLING ROUTES WITH ROUTER OBJECT
 router.route('/')
     .get(movieController.getAllMovies)

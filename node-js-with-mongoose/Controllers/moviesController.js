@@ -195,3 +195,35 @@ exports.getMovieStats = async (req, res) => {
     }
 }
 
+
+exports.getMovieByGenre = async (req, res) => {
+    try{
+        const genre = req.params.genre;
+        const movies = await Movie.aggregate([
+            {$unwind: '$genres'},
+            {$group: {
+                _id: '$genres',
+                movieCount: { $sum: 1},
+                movies: {$push: '$name'}, 
+            }},
+            {$addFields: {genre: "$_id"}},
+            {$project: {_id: 0}},
+            {$sort: {movieCount: -1}},
+            //{$limit: 6}
+            //{$match: {genre: genre}}
+        ]);
+
+        res.status(200).json({
+            status: 'success',
+            count: movies.length,
+            data: {
+                movies
+            }
+        });
+    }catch(err) {
+        res.status(404).json({
+            status:"fail",
+            message: err.message
+        });
+    }
+}
