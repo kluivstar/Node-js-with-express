@@ -87,6 +87,24 @@ movieSchema.post('save', function(doc, next){
     // calls the next middleware, which is the create post RHF
     next();
 });
+
+// handling query with Query Middleware
+movieSchema.pre('find', function(next){
+    this.find({releaseDate: {$lte: Date.now()}})
+    next()
+})
+
+//
+movieSchema.post(/^find/, function(doc, next){
+    this.find({releaseDate: {$lte: Date.now()}})
+    this.endTime = Date.now()
+    const content = `Query took ${this.endTime - this.startTime} milliseconds to fetch the document`
+    fs.writeFileSync('./Log/log.txt', content, {flag: 'a'}, (err)=>{
+        console.log(err.message);
+    });
+    next()
+})
+
 // creating model with schema..
 const Movie = mongoose.model('Movie', movieSchema);
 module.exports = Movie;
