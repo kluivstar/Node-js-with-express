@@ -6,7 +6,8 @@ const movieSchema = new mongoose.Schema({
         type: String,
         required: [true, 'Name is required'],
         unique: true,
-        trim: true
+        trim: true,
+        
     },
     
     description: {
@@ -19,7 +20,7 @@ const movieSchema = new mongoose.Schema({
         required: [true, 'Duration is required field!']
     },
     ratings: {
-        type: Number
+        type: Number,
         
     },
     totalRating: {
@@ -88,13 +89,13 @@ movieSchema.post('save', function(doc, next){
     next();
 });
 
-// handling query with Query Middleware
+// handling pre query with Query Middleware
 movieSchema.pre('find', function(next){
     this.find({releaseDate: {$lte: Date.now()}})
     next()
 })
 
-//
+// using post Query middleware to display movies to be released
 movieSchema.post(/^find/, function(doc, next){
     this.find({releaseDate: {$lte: Date.now()}})
     this.endTime = Date.now()
@@ -102,6 +103,12 @@ movieSchema.post(/^find/, function(doc, next){
     fs.writeFileSync('./Log/log.txt', content, {flag: 'a'}, (err)=>{
         console.log(err.message);
     });
+    next()
+})
+
+// Pre - Aggregation query
+movieSchema.pre('aggregate', function(next){
+
     next()
 })
 
