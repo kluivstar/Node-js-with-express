@@ -1,5 +1,5 @@
-const mongoose = require('mongoose')
-
+const mongoose = require('mongoose');
+const fs = require("fs");
 // creating a schema and model
 const movieSchema = new mongoose.Schema({
     name: {
@@ -61,9 +61,33 @@ const movieSchema = new mongoose.Schema({
         type: Number,
         require: [true, 'Price is required field!.']
     },
-})
+    createdBy: String
+    
+}, {
+    toJSON: {virtuals: true},
+    toObject: {virtuals: true}
+});
 
-// creating model with schema
-const Movie = mongoose.model('Movie', movieSchema)
-module.exports = Movie
+// virtual properites
+movieSchema.virtual('durationInHours').get(function(){
+    return this.duration / 60
+});
+
+// executing a 'pre' hook/a middleware function on a save event before a document is saved to database
+movieSchema.pre('save', function(next) {
+    this.createdBy = "X"
+    next();
+});
+
+movieSchema.post('save', function(doc, next){
+    const content = `A new movie document with ${doc.name} has been created by ${doc.createdBy}\n`;
+    fs.writeFileSync('./Log/log.txt', content, {flag: 'a'}, (err)=>{
+        console.log(err.message);
+    });
+    // calls the next middleware, which is the create post RHF
+    next();
+});
+// creating model with schema..
+const Movie = mongoose.model('Movie', movieSchema);
+module.exports = Movie;
 
