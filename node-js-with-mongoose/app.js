@@ -40,5 +40,13 @@ app.delete('/movies/:id', deleteMovie) */
 // using our imported route module
 app.use('/movies', moviesRouter)
 
+// defining route for non existent URLS
+app.all('*', (req, res, next) => {
+    res.status(404).json({
+        status: "fail",
+        message: `Cant find ${req.originalUrl} on the server!`
+    })
+    
+})
 // import server
 module.exports = app
