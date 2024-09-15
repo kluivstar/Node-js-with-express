@@ -50,7 +50,7 @@ app.all('*', (req, res, next) => {
     next(err)
 })
 
-// using our errot handler middleware
+// using our error handler middleware
 app.use(globalErrorHandler)
 
 // using our imported route module.
