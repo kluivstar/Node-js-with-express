@@ -37,16 +37,30 @@ app.post('/movies', createMovies)
 app.patch('/movies/:id', updateMovie)
 app.delete('/movies/:id', deleteMovie) */
 
-// using our imported route module
-app.use('/movies', moviesRouter)
-
 // defining route for non existent URLS
 app.all('*', (req, res, next) => {
-    res.status(404).json({
-        status: "fail",
-        message: `Cant find ${req.originalUrl} on the server!`
-    })
-    
+   // res.status(404).json({
+       // status: "fail",
+       // message: `Cant find ${req.originalUrl} on the server!`
+    //})
+    const err = new Error(`Cant find ${req.originalUrl} on the server!`)
+    err.status = 'fail'
+    err.statusCode = 404
+
+    next(err)
 })
+
+app.use((error, req, res, next) => {
+    error.statusCode = error.statusCode || 500
+    error.status = error.statusCode ||'error'
+    res.status(error.statusCode).json({
+        status: error.statusCode,
+        message: error.message
+    })
+})
+
+// using our imported route module.
+app.use('/movies', moviesRouter)
+
 // import server
 module.exports = app
