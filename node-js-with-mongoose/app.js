@@ -4,8 +4,8 @@ const morgan = require('morgan')
 const app = express()
 
 const moviesRouter = require('./Routes/moviesRoutes')
-
-
+const CustomError = require('./Utils/CustomError')
+const globalErrorHandler = require('./Controllers/errController')
 
 // custom middleware function that logs a message whenever a request hits your server. It calls next() to pass control to the next middleware in the stack.
 const logger =  function(req, res, next) {
@@ -43,21 +43,15 @@ app.all('*', (req, res, next) => {
        // status: "fail",
        // message: `Cant find ${req.originalUrl} on the server!`
     //})
-    const err = new Error(`Cant find ${req.originalUrl} on the server!`)
-    err.status = 'fail'
-    err.statusCode = 404
-
+    //const err = new Error(`Cant find ${req.originalUrl} on the server!`)
+    //err.status = 'fail'
+    //err.statusCode = 404
+    const err = new CustomError(`Cant find ${req.originalUrl} on the server!`, 404)
     next(err)
 })
 
-app.use((error, req, res, next) => {
-    error.statusCode = error.statusCode || 500
-    error.status = error.statusCode ||'error'
-    res.status(error.statusCode).json({
-        status: error.statusCode,
-        message: error.message
-    })
-})
+// using our errot handler middleware
+app.use(globalErrorHandler)
 
 // using our imported route module.
 app.use('/movies', moviesRouter)
