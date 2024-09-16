@@ -1,6 +1,8 @@
 const {params} = require('../Routes/moviesRoutes')
 const Movie = require('./../Models/movieModels')
 const ApiFeatures = require('./../Utils/ApiFeatures')
+const asyncErrorHandler = require('./../Utils/asyncErrorHandler')
+const CustomError = require('./../Utils/CustomError')
 
 // GETTING HIGHEST RATED USING ALIASE
 exports.getHighestRated = (req, res, next) => {
@@ -13,7 +15,7 @@ exports.getHighestRated = (req, res, next) => {
 }
 
 // ROUTE HANDLER FUNCTIONS
-exports.getAllMovies = async (req, res)=>{
+exports.getAllMovies = asyncErrorHandler(async (req, res, next)=>{
     try {
         const features = new ApiFeatures(Movie.find(), req.query)
                         .filter()
@@ -83,52 +85,47 @@ exports.getAllMovies = async (req, res)=>{
             message: err.message
         })
     }
-} 
+} )
 
 // GET SPECIFIC MOVIE/ID RP
-exports.getMovie = async (req, res) =>{
-    
-    try {
+exports.getMovie = asyncErrorHandler(async (req, res, next) =>{
         const movie = await Movie.findById(req.params.id)
+        if(!movie){
+            const error = new CustomError(`Movie with ID is not found`, 404)
+            return next(error)
+        }
         res.status(200).json({
             status: "success",
             data: {
                 movie
             }
         })
-    }catch(err){
-        res.status(404).json({
-            status: "fail",
-            message: err.message
-        })
     }
-}
+)
 
 
-exports.createMovies = async (req, res) => {
-    try {
+exports.createMovies = asyncErrorHandler(async (req, res, next) => {
+
         const movie = await Movie.create(req.body)
-
+        
         res.status(200).json({
             status: "success",
             data: {
                 movie
             }
         })
-    }catch(err){
-        res.status(404).json({
-            status: "fail",
-            data: {
-                message: err.message
-            }
-        })
-    }
-}
 
-exports.updateMovie = async (req, res) => {
+})
+
+exports.updateMovie = async (req, res, next) => {
     try {
         const updateMovie = await Movie.findByIdAndUpdate(req.params.id, req.body, {new: true, runValidators: true})
 
+        if(!updateMovie){
+            const error = new CustomError('Movie with that ID is not found', 404)
+            return next(error)
+        }
+        
         res.status(200).json({
             status: "success",
             data: {
@@ -145,26 +142,25 @@ exports.updateMovie = async (req, res) => {
     }
 }
 
-exports.deleteMovie = async (req, res) =>{
-    try {
-        const deleteMovie = await Movie.findByIdAndDelete(req.params.id)
+exports.deleteMovie = asyncErrorHandler(async (req, res, next) =>{
 
-        res.status(204).json({
-            status: "success",
-            data: null
-        })
-    }catch(err){
-        res.status(404).json({
-            status: "fail",
-            data: {
-                message: err.message
-            }
-        })
+    const deleteMovie = await Movie.findByIdAndDelete(req.params.id)
+    
+    if(!deleteMovie){
+        const error = new CustomError('Movie with that ID is not found', 404)
+        return next(error)
     }
-}
+    
+    res.status(204).json({
+        status: "success",
+        data: null
+    })
+})
 
-exports.getMovieStats = async (req, res) => {
-    try{
+
+exports.getMovieStats = asyncErrorHandler(
+    async (req, res, next) => {
+
         const stats = await Movie.aggregate([
             
             {$match: {ratings: {$gte: 8}}},
@@ -188,17 +184,14 @@ exports.getMovieStats = async (req, res) => {
                 stats
             }
         })
-    }catch(err){
-        res.status(404).json({
-            status: "fail",
-            message: err.message
-        })
-    }
+    
 }
+)
 
 
-exports.getMovieByGenre = async (req, res) => {
-    try{
+exports.getMovieByGenre = asyncErrorHandler(
+    async (req, res, next) => {
+
         const genre = req.params.genre;
         const movies = await Movie.aggregate([
             {$match: {releaseDate: {$lte: new Date()}}},
@@ -222,10 +215,5 @@ exports.getMovieByGenre = async (req, res) => {
                 movies
             }
         });
-    }catch(err) {
-        res.status(404).json({
-            status:"fail",
-            message: err.message
-        });
     }
-}
+)

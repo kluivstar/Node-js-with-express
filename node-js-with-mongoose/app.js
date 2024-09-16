@@ -37,6 +37,9 @@ app.post('/movies', createMovies)
 app.patch('/movies/:id', updateMovie)
 app.delete('/movies/:id', deleteMovie) */
 
+// using our imported route module.
+app.use('/movies', moviesRouter)
+
 // defining route for non existent URLS
 app.all('*', (req, res, next) => {
    // res.status(404).json({
@@ -53,8 +56,7 @@ app.all('*', (req, res, next) => {
 // using our error handler middleware
 app.use(globalErrorHandler)
 
-// using our imported route module.
-app.use('/movies', moviesRouter)
+
 
 // import server
 module.exports = app
