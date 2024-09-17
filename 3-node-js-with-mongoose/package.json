@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "main": "app.js",
   "scripts": {
-    "start": "nodemon server.js"
+    "start": "SET NODE_ENV=developmemt& nodemon server.js",
+    "start_prod": "SET NODE_ENV=production& nodemon server.js"
   },
   "author": "",
   "license": "ISC",
