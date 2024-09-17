@@ -46,14 +46,14 @@ module.exports = (error, req, res, next) => {
     error.statusCode = error.statusCode || 500
     error.status = error.status ||'error'
     
-    if(process.env.NODE_DEV === 'development'){
+    if(process.env.NODE_ENV === 'development'){
         devErrors(res, error)
-    } else if(process.env.NODE_DEV === 'production'){
+    } else if(process.env.NODE_ENV === 'production'){
         
         if(error.name == 'CastError') error = castErrorHandler(error);
         if(error.code == 11000) error = duplicateKeyErrorHandler(error);
         if(error.name == 'ValidationError') error = validatioinErrorHandler(error);
-        prodErrors(res, err)
+        prodErrors(res, error)
     
 }
 }
