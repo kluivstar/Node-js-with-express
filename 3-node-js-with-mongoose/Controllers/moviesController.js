@@ -80,10 +80,11 @@ exports.getAllMovies = asyncErrorHandler(async (req, res, next)=>{
             }
         })
     }catch(err){
-        res.status(404).json({
-            status: "fail",
-            message: err.message
-        })
+        //res.status(404).json({
+            //status: "fail",
+            //message: err.message
+       // })
+       console.log('Couldnt fetch movies')
     }
 } )
 

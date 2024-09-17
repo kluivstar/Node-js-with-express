@@ -14,20 +14,20 @@ const castErrorHandler = (err)=> {
     return new CustomError(msg, 400)
 }
 
-//const duplicateKeyErrorHandler = (err) =>{
-  //  const name = err.keyValue.name
-   // const msg = `Theres is already a movie with name ${name}. Kindly use another name`
-   // return new CustomError(msg, 400)
-//}
+const duplicateKeyErrorHandler = (err) =>{
+    const name = err.keyValue.name
+    const msg = `Theres is already a movie with name ${name}. Kindly use another name`
+    return new CustomError(msg, 400)
+}
 
-//const validatioinErrorHandler =(err) => {
-    //const errors = Object.values(err.errors).map(val => val.message)
-    //const errorMessages = errors.join('. ')
-    //const msg =`Invalid input data: $//{errorMessages}`
+const validatioinErrorHandler =(err) => {
+    const errors = Object.values(err.errors).map(val => val.message)
+    const errorMessages = errors.join('. ')
+    const msg =`Invalid input data: $//{errorMessages}`
 
-    //return new CustomError(msg, 400)
+    return new CustomError(msg, 400)
     
-//}
+}
 const prodErrors = (res, error) => {
     if(error.isOperational){
         res.status(error.statusCode).json({
@@ -49,15 +49,11 @@ module.exports = (error, req, res, next) => {
     if(process.env.NODE_DEV === 'development'){
         devErrors(res, error)
     } else if(process.env.NODE_DEV === 'production'){
-        console.log('Running in Prod')
-        let err = {...error}
-        if(err.name === 'CastError'){
-            err = castErrorHandler(err)
-        }
-        //if(error.name == 'CastError' error = castErrorHandler(error));
-        //if(error.code == 11000 error = duplicateKeyErrorHandler(error));
-        //if(error.name == 'ValidationError' error = validatioinErrorHandler(error));
-        prodErrors(res, error)
+        
+        if(error.name == 'CastError') error = castErrorHandler(error);
+        if(error.code == 11000) error = duplicateKeyErrorHandler(error);
+        if(error.name == 'ValidationError') error = validatioinErrorHandler(error);
+        prodErrors(res, err)
     
 }
 }
