@@ -1,15 +1,25 @@
 const mongoose = require('mongoose')
 // import dotenv
 const dotenv = require('dotenv')
-
-//reading/loading our config file defining our environmental variable like CONN_STR
 dotenv.config({path: './config.env'})
-console.log(process.env)
+
+//Handing uncaught exceptions , happens sychrounsly
+process.on('uncaughtException', (err) =>{
+    console.log(err.name, err.message);
+    console.log('Uncaught Exception occured! Shutting down..')
+
+    process.exit(1)
+})
+
 // require express importing main express app from the app.js
 const app = require('./app')
 
-// Create Server
-const port = process.env.PORT || 3000
+//reading/loading our config file defining our environmental variable like CONN_STR
+
+console.log(process.env)
+
+
+
 
 // connecting to remote DB
 mongoose.connect(process.env.CONN_STR, {
@@ -18,8 +28,9 @@ mongoose.connect(process.env.CONN_STR, {
     console.log('DB started something.')
 })
 
+// Create Server
+const port = process.env.PORT || 3000
 
-// server
 app.listen(port, ()=>{
     console.log("Server wanna be startin something.")
 })
@@ -33,3 +44,4 @@ process.on('unhandledRejection', (err) =>{
         process.exit(1)
     })
 })
+
