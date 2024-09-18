@@ -3,8 +3,8 @@
   "version": "1.0.0",
   "main": "app.js",
   "scripts": {
-    "start": "SET NODE_ENV=developmemt& nodemon server.js",
-    "start_prod": "SET NODE_ENV=production& nodemon server.js"
+    "start": "cross-env NODE_ENV=development nodemon server.js",
+    "start_prod": "cross-env NODE_ENV=production nodemon server.js"
   },
   "author": "",
   "license": "ISC",
@@ -17,6 +17,7 @@
     "validator": "^13.12.0"
   },
   "devDependencies": {
+    "cross-env": "^7.0.3",
     "morgan": "^1.10.0"
   }
 }

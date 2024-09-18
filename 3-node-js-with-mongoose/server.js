@@ -16,12 +16,20 @@ mongoose.connect(process.env.CONN_STR, {
     useNewUrlParser: true
 }).then((conn) => {
     console.log('DB started something.')
-}).catch((error) =>{
-    console.log('Some error has occured, DB not startin something')
 })
 
 
 // server
 app.listen(port, ()=>{
     console.log("Server wanna be startin something.")
+})
+
+// Handling Mongoose Validation Error
+process.on('unhandledRejection', (err) =>{
+    console.log(err.name, err.message);
+    console.log('Unhandled rejection occured! Shutting down..')
+
+    server.close(()=> {
+        process.exit(1)
+    })
 })

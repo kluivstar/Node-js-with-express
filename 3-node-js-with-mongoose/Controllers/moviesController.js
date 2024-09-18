@@ -16,7 +16,6 @@ exports.getHighestRated = (req, res, next) => {
 
 // ROUTE HANDLER FUNCTIONS
 exports.getAllMovies = asyncErrorHandler(async (req, res, next)=>{
-    try {
         const features = new ApiFeatures(Movie.find(), req.query)
                         .filter()
                         .sort()
@@ -79,13 +78,7 @@ exports.getAllMovies = asyncErrorHandler(async (req, res, next)=>{
                 movies
             }
         })
-    }catch(err){
-        //res.status(404).json({
-            //status: "fail",
-            //message: err.message
-       // })
-       console.log('Couldnt fetch movies')
-    }
+   
 } )
 
 // GET SPECIFIC MOVIE/ID RP
