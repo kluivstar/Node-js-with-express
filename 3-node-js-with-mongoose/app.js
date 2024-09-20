@@ -4,6 +4,7 @@ const morgan = require('morgan')
 const app = express()
 
 const moviesRouter = require('./Routes/moviesRoutes')
+const authRouter = require('./Routes/authRouter')
 const CustomError = require('./Utils/CustomError')
 const globalErrorHandler = require('./Controllers/errController')
 
@@ -39,7 +40,7 @@ app.delete('/movies/:id', deleteMovie) */
 
 // using our imported route module.
 app.use('/movies', moviesRouter)
-
+app.use('/users', authRouter)
 // defining route for non existent URLS
 app.all('*', (req, res, next) => {
    // res.status(404).json({
@@ -49,7 +50,7 @@ app.all('*', (req, res, next) => {
     //const err = new Error(`Cant find ${req.originalUrl} on the server!`)
     //err.status = 'fail'
     //err.statusCode = 404
-    const err = new CustomError(`Cant find ${req.originalUrl} on the server!`, 404)
+    const err = new CustomError(`Cant find ${req.originalUrl} on the server!!`, 404)
     next(err)
 })
 
