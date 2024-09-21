@@ -18,7 +18,8 @@ const userSchema = new mongoose.Schema({
     password: {
         type: String,
         required: [true, 'Please enter a password'],
-        minlength: 8
+        minlength: 8,
+        select: false
     },
     confirmPassword: {
         type: String,
@@ -39,6 +40,11 @@ userSchema.pre('save', async function(next){
         this.confirmPassword = undefined
         next()
 })
+
+// logging in a user by comparing credentials
+userSchema.methods.comparePasswordInDb = async function(pswd, pswdDB){
+    return await bcrypt.compare(pswd, pswdDB)
+}
 // user Model
 const User = mongoose.model('User', userSchema)
 
