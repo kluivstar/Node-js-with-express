@@ -2,7 +2,7 @@ const express = require('express')
 
 // IMPORT CONTROLLER
 const movieController = require('./../Controllers/moviesController')
-
+const authController = require('./../Controllers/authController')
 const router = express.Router()
 
 //HANDLING REQUEST TO GET HIGHEST RATED MOVIES IN DATABASE
@@ -19,7 +19,7 @@ router.route('/movie-by-genre')
     
 // HANDLING ROUTES WITH ROUTER OBJECT
 router.route('/')
-    .get(movieController.getAllMovies)
+    .get(authController.protect, movieController.getAllMovies)
     .post(movieController.createMovies)
 
 // HANDLING ROUTES PARAMETER TO SPECIFIC IDs WITH ROUTER OBJECT
