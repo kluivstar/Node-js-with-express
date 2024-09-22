@@ -63,5 +63,21 @@ exports.protect = asyncErrorHandler(async (req, res, next) => {
 
     // validate token
     const decodedToken = await util.promisify(jwt.verify)(token, process.env.SECRET_STR)
+
+    // if user exists
+    const user = await User.findById(decodedToken.id)
+    if(!user){
+        const error = new customError('The user with given token does not exist.', 401)
+        next(error)
+    }
+
+    // if user changed password after token was issued
+    if(await user.isPasswordChanged(decodedToken.id)){
+        const error = new customError("Password was changed resently, kindly login again", 401)
+        return next(error)
+    }
+
+    // allow user to access route
+    res.user == user
     next()
 })
