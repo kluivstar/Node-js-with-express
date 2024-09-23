@@ -92,3 +92,22 @@ exports.restrict = (role) => {
         next()
     }
 }
+
+exports.forgotPassword = asyncErrorHandler(async (req, res, next) => {
+
+    // Get user based on posted email
+    const user = await User.findOne({email: req.body.email})
+    if(!user){
+        const error = new customError("User doesnt exist..", 404)
+        return next(error)
+    }
+    // Generate a random reset token
+    const resetToken = user.createResetPasswordToken()
+    await user.save({validateBeforeSave: false})
+    // Send the token back to the user email...
+
+})
+
+exports.resetPassword = asyncErrorHandler(async (req, res, next) => {
+    console.log('Hi.')
+})

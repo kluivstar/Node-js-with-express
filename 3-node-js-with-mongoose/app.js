@@ -38,9 +38,10 @@ app.post('/movies', createMovies)
 app.patch('/movies/:id', updateMovie)
 app.delete('/movies/:id', deleteMovie) */
 
-// using our imported route module.
+// using/mounting our imported route module.
 app.use('/movies', moviesRouter)
 app.use('/users', authRouter)
+
 // defining route for non existent URLS
 app.all('*', (req, res, next) => {
    // res.status(404).json({
