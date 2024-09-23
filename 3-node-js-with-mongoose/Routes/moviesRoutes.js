@@ -23,6 +23,7 @@ router.route('/')
     .post(movieController.createMovies)
 
 // HANDLING ROUTES PARAMETER TO SPECIFIC IDs WITH ROUTER OBJECT
+// COMMIT CORRECTION
 router.route('/:id')
     .get(movieController.getMovie)
     .patch(movieController.updateMovie)
