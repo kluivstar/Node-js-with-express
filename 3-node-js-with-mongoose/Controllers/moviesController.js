@@ -147,9 +147,11 @@ exports.deleteMovie = asyncErrorHandler(async (req, res, next) =>{
         return next(error)
     }
     
-    res.status(204).json({
+    res.status(201).json({
         status: "success",
-        data: null
+        data: {
+            message: 'Movie successfully deleted'
+        }
     })
 })
 

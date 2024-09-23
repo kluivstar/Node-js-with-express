@@ -54,7 +54,7 @@ exports.protect = asyncErrorHandler(async (req, res, next) => {
     // Read the token and check if it exist
     const testToken = req.headers.authorization
     let token
-    if(testToken && testToken.startsWith('bearer')){
+    if(testToken && testToken.startsWith('Bearer')){
         token = testToken.split(' ')[1]
     }
     if(!token){
@@ -72,12 +72,23 @@ exports.protect = asyncErrorHandler(async (req, res, next) => {
     }
 
     // if user changed password after token was issued
-    if(await user.isPasswordChanged(decodedToken.id)){
+    const isPasswordChanged = await user.isPasswordChanged(decodedToken.iat)
+    if(isPasswordChanged){
         const error = new customError("Password was changed resently, kindly login again", 401)
         return next(error)
     }
 
     // allow user to access route
-    res.user == user
+    req.user = user
     next()
 })
+exports.restrict = (role) => {
+    return (req, res, next) => {
+        if(req.user.role !== role){
+            const error = new customError("You do not have permission to perform this action..", 403)
+            next(error)
+        }
+        // allows user delete movie if role is admin by called the next MW "deleteMovie"
+        next()
+    }
+}

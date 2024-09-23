@@ -26,7 +26,7 @@ router.route('/')
 router.route('/:id')
     .get(movieController.getMovie)
     .patch(movieController.updateMovie)
-    .delete(movieController.deleteMovie)
+    .delete(authController.protect, authController.restrict('admin'), movieController.deleteMovie)
 
 
 module.exports = router;
