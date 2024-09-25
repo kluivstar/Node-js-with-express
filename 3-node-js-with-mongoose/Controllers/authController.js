@@ -3,6 +3,7 @@ const asyncErrorHandler = require('./../Utils/asyncErrorHandler')
 const jwt = require('jsonwebtoken')
 const customError = require('./../Utils/CustomError')
 const util = require('util')
+const sendEmail = require('./../Utils/email')
 
 // reuseable sign Token 
 const signToken = id => {
@@ -67,47 +68,69 @@ exports.protect = asyncErrorHandler(async (req, res, next) => {
     // if user exists
     const user = await User.findById(decodedToken.id)
     if(!user){
-        const error = new customError('The user with given token does not exist.', 401)
+        const error = new customError('The user with given token does not exist.', 401);
         next(error)
-    }
+    };
 
     // if user changed password after token was issued
     const isPasswordChanged = await user.isPasswordChanged(decodedToken.iat)
     if(isPasswordChanged){
-        const error = new customError("Password was changed resently, kindly login again", 401)
-        return next(error)
-    }
+        const error = new customError("Password was changed resently, kindly login again", 401);
+        return next(error);
+    };
 
     // allow user to access route
-    req.user = user
-    next()
-})
+    req.user = user;
+    next();
+});
+
 exports.restrict = (role) => {
     return (req, res, next) => {
         if(req.user.role !== role){
-            const error = new customError("You do not have permission to perform this action..", 403)
-            next(error)
+            const error = new customError("You do not have permission to perform this action..", 403);
+            next(error);
         }
         // allows user delete movie if role is admin by called the next MW "deleteMovie"
-        next()
+        next();
     }
-}
+};
 
 exports.forgotPassword = asyncErrorHandler(async (req, res, next) => {
 
     // Get user based on posted email
-    const user = await User.findOne({email: req.body.email})
+    const user = await User.findOne({email: req.body.email});
     if(!user){
-        const error = new customError("User doesnt exist..", 404)
-        return next(error)
+        const error = new customError("User doesnt exist..", 404);
+        return next(error);
     }
+    
     // Generate a random reset token
-    const resetToken = user.createResetPasswordToken()
-    await user.save({validateBeforeSave: false})
-    // Send the token back to the user email...
+    const resetToken = user.createResetPasswordToken();
+    await user.save({validateBeforeSave: false});
 
-})
+    // Send the token back to the user email...
+    const resetUrl = `${req.protocol}://${req.get('host')}/users/resetPassword/${resetToken}`;
+    const message = `We received a password reset request. Kindly use the link below to reset your password\n\n${resetUrl}\n\nThis reset password link will be valid only for 10 minutes`;
+
+    try{
+        await sendEmail({
+            email: user.email,
+            subject: 'Password changed request received',
+            message: message
+        });
+            res.status(200).json({
+                status: 'success',
+                message: 'Password reset link sent to the user email.'
+            });
+    }catch(err){
+        user.passwordResetToken = undefined;
+        user.passwordResetTokenExpires = undefined;
+        user.save({validateBeforeSave: false});
+        return next(new customError('There was an error sending password reset email, kindly try again later', 500));
+    };
+
+});
 
 exports.resetPassword = asyncErrorHandler(async (req, res, next) => {
     console.log('Hi.')
-})
+});
