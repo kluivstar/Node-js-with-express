@@ -155,20 +155,3 @@ exports.resetPassword = asyncErrorHandler(async (req, res, next) => {
     createSendResponse(user, 200, res)
 });
 
-exports.updatePassword = asyncErrorHandler(async(req, res, next) => {
-    // Get current user data from database
-    const user = await User.findById(req.user._id).select('+password')
-
-    // check if the supplied current password is correct
-    if(!(await user.comparePasswordInDb(req.body.currentPassword, user.password))){
-        return next(new customError('The current password you provided is wrong', 401))
-    }
-
-    // If supplied password is correct, update user password with new value
-    user.password = req.body.password
-    user.confirmPassword = req.body.confirmPassword
-    await user.save()
-
-    // Login user and send JWT
-    createSendResponse(user, 200, res)
-})
