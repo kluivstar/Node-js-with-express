@@ -2,7 +2,7 @@
 const express = require('express')
 const morgan = require('morgan')
 const app = express()
-
+const rateLimit = require('express-rate-limit')
 const moviesRouter = require('./Routes/moviesRoutes')
 const authRouter = require('./Routes/authRouter')
 const userRoute = require('./Routes/userRoute')
@@ -24,9 +24,19 @@ app.use(express.json())
 // The logger middleware function defined earlier is then added, logging "Custom middleware called" on every request.
 //app.use(logger)
 
-//to serve static files
+//To serve static files
 app.use(express.static('./Public'))
 
+// Rate limit
+let limiter = rateLimit({
+  max: 500,
+  windowMs: 60 * 60 * 1000,
+  message: 'Too many request detected from the IP, take a walk and try again later'
+})
+
+// Using the limiter
+app.use('/user', limiter)
+app.use('/auth', limiter)
 // This middleware adds a requestedAt property to the request object, containing the timestamp of when the request was made.
 //app.use((req, res, next) =>{
   //  req.requestedAt = new Date().toISOString()
