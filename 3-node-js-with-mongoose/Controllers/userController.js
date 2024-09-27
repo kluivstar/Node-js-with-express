@@ -7,10 +7,11 @@ const sendEmail = require('./../Utils/email')
 const crypto = require('crypto')
 const authController = require('./authController')
 
+// Reusable Sign In Token
 const signToken = id => {
     return jwt.sign({id}, process.env.SECRET_STR, {expiresIn: process.env.LOGIN_EXPIRES})
 }
-
+// Reuseable function to Generate token and send response
 const createSendResponse = (user, statusCode, res) => {
     const token = signToken(user._id)
     // if a user is created
@@ -23,6 +24,21 @@ const createSendResponse = (user, statusCode, res) => {
     })
 }
 
+// Get All Users
+exports.getAllUsers = asyncErrorHandler(async(req, res, next) => {
+    // Get current user data from database
+    const users = await User.find()
+
+    res.status(200).json({
+        status: "success",
+        result: users.length,
+        data: {
+            users
+        }
+    })
+})
+
+// Filter through only allow fields during User update
 const filterReqObj = (obj, ...allowedFields) => {
     const newObj = {}
     Object.keys(obj).forEach(prop => {
@@ -32,6 +48,7 @@ const filterReqObj = (obj, ...allowedFields) => {
     return newObj
 }
 
+// Update User Password
 exports.updatePassword = asyncErrorHandler(async(req, res, next) => {
     // Get current user data from database
     const user = await User.findById(req.user._id).select('+password')
@@ -50,6 +67,7 @@ exports.updatePassword = asyncErrorHandler(async(req, res, next) => {
     createSendResponse(user, 200, res)
 })
 
+// Update User Profile
 exports.updateMe = asyncErrorHandler(async(req, res, next) => {
     // Get current user data from database
     if(req.body.password || req.body.confirmPassword){
@@ -58,6 +76,21 @@ exports.updateMe = asyncErrorHandler(async(req, res, next) => {
 
     //Update user detail
     const filterObj = filterReqObj(req.body, 'name', 'email')
-    const updatedUser = await User.findByIdAndUpdate(req.user._id, filterObj, {runValidators: true, new: true})
+    const updatedUser = await User.findByIdAndUpdate(req.user.id, filterObj, {runValidators: true, new: true})
     //await updateUser.save()
+
+    res.status(200).json({
+        status: "success",
+        token,
+        data: updatedUser
+    })
+})
+
+// Deletes User Profile
+exports.deleteMe = asyncErrorHandler(async(req, res, next) => {
+    await User.findByIdAndUpdate(req.user.id, {active: false})
+    res.status(204).json({
+        status: "success",
+        data: null
+    })
 })

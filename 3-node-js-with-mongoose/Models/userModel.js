@@ -39,17 +39,30 @@ const userSchema = new mongoose.Schema({
             message: "Password and Confirm password don't match"
         }
     },
+    active:  {
+        type: Boolean,
+        default: true,
+        select: false
+    },
+
     passwordChangedAt: Date,
     passwordResetToken: String,
     passwordResetTokenExpires: Date
     
 })
+
 userSchema.pre('save', async function(next){
     if(!this.isModified('password')) return next()
         // encrypt password before saving it
         this.password = await bcrypt.hash(this.password, 12)
         this.confirmPassword = undefined
         next()
+})
+
+// Instance runs before query in getAllUsers RHF to get active users
+userSchema.pre(/^find/, async function(next){
+    this.find({active: {$ne: false}})
+    next()
 })
 
 // logging in a user by comparing credentials
