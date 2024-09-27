@@ -10,20 +10,24 @@ const crypto = require('crypto')
 const signToken = id => {
     return jwt.sign({id}, process.env.SECRET_STR, {expiresIn: process.env.LOGIN_EXPIRES})
 }
+
+const createSendResponse = (user, statusCode, res) => {
+    const token = signToken(user._id)
+    // if a user is created
+    res.status(statusCode).json({
+        status: "success",
+        token,
+        data: {
+            user
+        }
+    })
+}
 // RHF handles signing up a user
 // asyncErrorHandler catches error for exception i.e if a user is not created
 exports.signup = asyncErrorHandler(async (req, res, next) =>{
     const newUser = await User.create(req.body)
 
-    const token = signToken(newUser._id)
-    // if a user is created
-    res.status(201).json({
-        status: "success",
-        token,
-        data: {
-            user: newUser
-        }
-    })
+    createSendResponse(newUser, 201, res)
 })
 
 // RHF handles logging in a user
@@ -44,12 +48,8 @@ exports.login = asyncErrorHandler(async (req, res, next) => {
         const error = new customError('Incorrect credentials', 400)
         return next(error)
     }
-
-    const token = signToken(user._id)
-    res.status(200).json({
-        status: "success",
-        token
-    })
+    createSendResponse(user, 200, res)
+    
 })
 
 exports.protect = asyncErrorHandler(async (req, res, next) => {
@@ -152,10 +152,23 @@ exports.resetPassword = asyncErrorHandler(async (req, res, next) => {
     user.save()
     
     // Login the user
-    const loginToken = signToken(user._id)
-
-    res.status(200).json({
-        status: "success",
-        token: loginToken
-    })
+    createSendResponse(user, 200, res)
 });
+
+exports.updatePassword = asyncErrorHandler(async(req, res, next) => {
+    // Get current user data from database
+    const user = await User.findById(req.user._id).select('+password')
+
+    // check if the supplied current password is correct
+    if(!(await user.comparePasswordInDb(req.body.currentPassword, user.password))){
+        return next(new customError('The current password you provided is wrong', 401))
+    }
+
+    // If supplied password is correct, update user password with new value
+    user.password = req.body.password
+    user.confirmPassword = req.body.confirmPassword
+    await user.save()
+
+    // Login user and send JWT
+    createSendResponse(user, 200, res)
+})
