@@ -4,6 +4,8 @@ const morgan = require('morgan')
 const app = express()
 const rateLimit = require('express-rate-limit')
 const helmet = require('helmet')
+const sanitize = require('express-mongo-sanitize')
+const xss = require('xss-clean')
 const moviesRouter = require('./Routes/moviesRoutes')
 const authRouter = require('./Routes/authRouter')
 const userRoute = require('./Routes/userRoute')
@@ -15,8 +17,13 @@ const globalErrorHandler = require('./Controllers/errController')
   // console.log('Custom middleware called')
     //next()
 //}
+
 // Middleware that parse incoming JSON request
 app.use(express.json({limit: '10kb'}))
+
+// using Santize and XSS - Clean
+app.use(sanitize())
+app.use(xss())
 
 //if(process.env.NODE_ENV === 'development'){
   //  app.use(morgan('dev'))
@@ -40,11 +47,13 @@ let limiter = rateLimit({
 // Using the limiter
 app.use('/user', limiter)
 app.use('/auth', limiter)
+
 // This middleware adds a requestedAt property to the request object, containing the timestamp of when the request was made.
 //app.use((req, res, next) =>{
   //  req.requestedAt = new Date().toISOString()
     //next()
 //})
+
 // api/movies
 /* app.get('/movies', getAllMovies)
 app.get('/movies/:id', getRouteId)
