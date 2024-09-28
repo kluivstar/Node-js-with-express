@@ -3,6 +3,7 @@ const express = require('express')
 const morgan = require('morgan')
 const app = express()
 const rateLimit = require('express-rate-limit')
+const helmet = require('helmet')
 const moviesRouter = require('./Routes/moviesRoutes')
 const authRouter = require('./Routes/authRouter')
 const userRoute = require('./Routes/userRoute')
@@ -15,7 +16,7 @@ const globalErrorHandler = require('./Controllers/errController')
     //next()
 //}
 // Middleware that parse incoming JSON request
-app.use(express.json())
+app.use(express.json({limit: '10kb'}))
 
 //if(process.env.NODE_ENV === 'development'){
   //  app.use(morgan('dev'))
@@ -27,6 +28,8 @@ app.use(express.json())
 //To serve static files
 app.use(express.static('./Public'))
 
+// Helmet
+app.use(helmet())
 // Rate limit
 let limiter = rateLimit({
   max: 500,
